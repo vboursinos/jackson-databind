@@ -61,16 +61,16 @@ public class SimpleBenchmark {
         for (int i = 0; i < NUMBER_OF_OBJECTS; i++) {
             Person person = new Person();
             person.setName("Person " + (i + 1));
-            person.setAge(random.nextInt(50) + 18);
-            person.setStudent(random.nextBoolean());
+            person.setAge(40);
+            person.setStudent(false);
             person.setCity(getRandomCity());
             person.setCountry(getRandomCountry());
-            person.setEmail("person" + (i + 1) + "@example.com");
-            person.setPhone(getRandomPhoneNumber());
-            person.setHeight(random.nextDouble() * 100 + 150);
-            person.setWeight(random.nextDouble() * 70 + 50);
-            person.setEmployed(random.nextBoolean());
-            person.setSalary(random.nextInt(20000) + 30000);
+            person.setEmail("abc_new@example.com");
+            person.setPhone("0120340560");
+            person.setHeight(150);
+            person.setWeight(50);
+            person.setEmployed(true);
+            person.setSalary(30000);
 
             personList.add(person);
         }
@@ -148,11 +148,6 @@ public class SimpleBenchmark {
         String[] countries = {"USA", "UK", "Japan", "France", "Australia", "Germany", "China", "Italy", "Russia", "Singapore"};
         Random random = new Random();
         return countries[random.nextInt(countries.length)];
-    }
-
-    private static String getRandomPhoneNumber() {
-        Random random = new Random();
-        return "+1-" + (random.nextInt(900) + 100) + "-" + (random.nextInt(900) + 100) + "-" + (random.nextInt(9000) + 1000);
     }
 
 }
