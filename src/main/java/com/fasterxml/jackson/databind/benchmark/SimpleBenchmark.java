@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -27,6 +28,8 @@ public class SimpleBenchmark {
         parseJsonStringAndPrintResults(jsonString);
         employeeAnalyzer();
         countriesAnalyzer();
+        employeeSalariesSum();
+        employeeSalariesSumWithStr();
         long end = System.currentTimeMillis();
         System.out.println("time: " + (end - start));
     }
@@ -74,6 +77,63 @@ public class SimpleBenchmark {
             }
         }
     }
+
+    public static void employeeSalariesSum() {
+        String fileName = EMPLOYEE_FILE; // Change to your JSON file name
+        for (int i = 0; i < 5; i++) {
+            long totalSalary = calculateTotalSalary(fileName);
+            System.out.println("Total sum of all salaries: $" + totalSalary);
+        }
+    }
+
+    public static void employeeSalariesSumWithStr() {
+        String fileName = EMPLOYEE_FILE; // Change to your JSON file name
+        for (int i = 0; i < 10; i++) {
+            long totalSalary = calculateTotalSalaryWithStr(fileName);
+            System.out.println("Str Total sum of all salaries: $" + totalSalary);
+        }
+    }
+
+    private static long calculateTotalSalary(String fileName) {
+        long totalSalary = 0;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            Path filePath = Paths.get(fileName);
+            JsonNode root = objectMapper.readTree(filePath.toFile());
+
+            for (JsonNode jsonNode : root) {
+                int salary = jsonNode.get("salary").asInt();
+                totalSalary += salary;
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading JSON file: " + e.getMessage());
+        }
+
+        return totalSalary;
+    }
+
+    private static long calculateTotalSalaryWithStr(String fileName) {
+        long totalSalary = 0;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            Path filePath = Paths.get(fileName);
+            StringBuilder jsonString = new StringBuilder(new String(Files.readAllBytes(filePath)));
+
+            JsonNode root = objectMapper.readTree(jsonString.toString());
+
+            for (JsonNode jsonNode : root) {
+                int salary = jsonNode.get("salary").asInt();
+                totalSalary += salary;
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading JSON file: " + e.getMessage());
+        }
+
+        return totalSalary;
+    }
+
     private static List<Country> getTopPopulationCountries(String fileName, int topCount) {
         List<Country> countryList = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
