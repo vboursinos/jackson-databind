@@ -1,14 +1,25 @@
 package com.fasterxml.jackson.databind.benchmark;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SimpleBenchmark {
 
+    private static final String TOP_COUNTRIES_FILE = "files/countries.json";
+    private static final String EMPLOYEE_FILE = "files/employee.json";
+    private static final String USER_FILE = "files/user.json";
+    private static final int TOP_COUNT = 20;
     private static final String FILE_PATH = "random.json";
     private static int NUMBER_OF_OBJECTS = 800000;
 
@@ -18,9 +29,50 @@ public class SimpleBenchmark {
         parseJsonFileAndPrintResults();
         String jsonString = generateRandomJsonString();
         parseJsonStringAndPrintResults(jsonString);
+        countriesAnalyzer();
         long end = System.currentTimeMillis();
         System.out.println("time: " + (end - start));
     }
+
+    private static void countriesAnalyzer() {
+        String fileName = TOP_COUNTRIES_FILE; // Change to your JSON file name
+        int topCount = TOP_COUNT;
+        for (int i = 0; i < 5; i++) {
+            List<Country> topCountries = getTopPopulationCountries(fileName, topCount);
+
+            System.out.println("Top " + topCount + " Countries by Population:");
+            for (Country country : topCountries) {
+                System.out.println(country.getCountryName() + ": " + country.getPopulation());
+            }
+        }
+    }
+    private static List<Country> getTopPopulationCountries(String fileName, int topCount) {
+        List<Country> countryList = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            Path filePath = Paths.get(fileName);
+            JsonNode root = objectMapper.readTree(filePath.toFile());
+
+            for (JsonNode jsonNode : root) {
+                String countryName = jsonNode.get("countryName").asText();
+                int population = jsonNode.get("population").asInt();
+                countryList.add(new Country(countryName, population));
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading JSON file: " + e.getMessage());
+        }
+
+        Collections.sort(countryList, new Comparator<Country>() {
+            @Override
+            public int compare(Country c1, Country c2) {
+                return Integer.compare(c2.getPopulation(), c1.getPopulation());
+            }
+        });
+
+        return countryList.subList(0, Math.min(topCount, countryList.size()));
+    }
+
 
     public static void generateJsonFile() {
 
