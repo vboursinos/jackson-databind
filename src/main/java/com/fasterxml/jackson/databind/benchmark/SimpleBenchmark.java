@@ -6,13 +6,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SimpleBenchmark {
 
@@ -29,9 +25,41 @@ public class SimpleBenchmark {
         parseJsonFileAndPrintResults();
         String jsonString = generateRandomJsonString();
         parseJsonStringAndPrintResults(jsonString);
+        employeeAnalyzer();
         countriesAnalyzer();
         long end = System.currentTimeMillis();
         System.out.println("time: " + (end - start));
+    }
+
+    private static void employeeAnalyzer() {
+        //parse 70mb json file and use counter and sum
+        for (int i = 0; i < 5; i++) {
+            String fileName = EMPLOYEE_FILE; // Change to your JSON file name
+            int count = countSalariesOver100000(fileName);
+            System.out.println("----------------------------------------");
+            System.out.println("Number of salaries over $100,000: " + count);
+        }
+    }
+
+    private static int countSalariesOver100000(String fileName) {
+        int count = 0;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            Path filePath = Paths.get(fileName);
+            JsonNode root = objectMapper.readTree(filePath.toFile());
+
+            for (JsonNode jsonNode : root) {
+                int salary = jsonNode.get("salary").asInt();
+                if (salary > 100000) {
+                    count++;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading JSON file: " + e.getMessage());
+        }
+
+        return count;
     }
 
     private static void countriesAnalyzer() {
